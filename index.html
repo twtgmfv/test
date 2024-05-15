@@ -2,15 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
-  <style>
-      body {
-          background: black;
-      }
-  </style>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>state的基本使用</title>
+  <!-- 引入react引入核心库, 需要按顺序引入 -->
+  <script type="text/javascript" src="../js/react.development.js"></script>
+  <!-- 引入react-dom, 用于支持react操作DOM -->
+  <script type='text/javascript' src='../js/react-dom.development.js'></script>
+  <!-- 引入babel，用于将jsx转为js -->
+  <script type='text/javascript' src='../js/babel.min.js'></script>
 </head>
 <body>
-<h1>TEST</h1>
-<img src="icon.svg" />
+<div id="test"></div>
+
+<script type="text/babel">
+  // 1.定义一个组件(函数式)
+
+  function Demo(props) {
+    const {msg} = props;
+    console.log(this) // 此处的this是undefined，因为经过babel翻译，开启了严格模式
+
+    // 如果将props转化为state使用后，如果props发生变化后是不能重绘的，必须使用useEffect触发
+    const [msg2, setMsg2] = React.useState(msg)
+    React.useEffect(() => {
+      setMsg2(msg)
+    })
+
+    return <h2>{msg2}我是用函数定义的组件（适用于【简单组件】的定义）</h2> // 组件标签
+  }
+
+  function ToDo() {
+    const [pmsg, setPmsg] = React.useState(Date.now())
+    return (
+      <div>
+        <Demo msg={pmsg}/>
+        <button onClick={() => {
+            setPmsg(Date.now())
+        }}>Change...
+        </button>
+      </div>
+    )
+  }
+
+  function App() {
+    return <ToDo/>;
+  }
+
+
+  // 2.渲染组件到页面
+  ReactDOM.render(<App/>, document.getElementById('test'))
+  /**
+   * 执行了ReactDOM.render(<Demo/>....)后发生了什么?
+   * 1.React解析组件标签，寻找Demo组件的定义位置
+   * 2.React发现Demo组件是用函数定义的，
+   *    随后React去直接调用Demo函数，将【返回的值】渲染到页面
+   */
+</script>
 </body>
 </html>
